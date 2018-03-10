@@ -1,0 +1,12 @@
+[Unit]
+Description=grails app petclinic 
+After=network.target
+
+[Service]
+Environment=JAVA_HOME=/usr/lib/jvm/default-java
+PIDFile=/var/run/petclinic.%i.pid
+#Type=forking
+ExecStart=/srv/grails/petclinic/start_grails
+
+[Install]
+WantedBy=multi-user.target

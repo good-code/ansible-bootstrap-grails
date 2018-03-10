@@ -1,0 +1,68 @@
+- hosts: default 
+  vars:
+    http_port: 80
+    max_clients: 200
+  remote_user: root
+  tasks:
+  - name: "install nginx"
+    apt:
+      name: nginx
+      state: present
+    become: true
+  - name: "config nginx"
+    template: 
+      src: templates/nginx.cnf
+      dest: /etc/nginx/sites-available/default
+    become: true
+    notify: restartnginx
+  - name: "add grails user"
+    user:
+      name: grails
+      shell: /bin/bash
+      groups: www-data
+      home: /srv/grails
+    become: true
+  - name: "clone grails repo"
+    git:
+      repo: 'https://github.com/secretescapes/grails-petclinic.git'
+      dest: /srv/grails/petclinic
+      version: master
+    become: true
+    become_user: grails
+  - name: "install java openjdk8"
+    apt:
+      name: default-jdk
+      state: present
+    become: true
+  - name: "add Java home"
+    lineinfile:
+      path: /etc/environment
+      line: /usr/lib/jvm/java-8-openjdk-amd64/
+    become: true
+  - name: "add grails exec file"
+    template:
+      src: templates/grails.exec
+      dest: /srv/grails/petclinic/start_grails
+      mode: 0770
+    become: true
+  - name: "add and enable grails service"
+    template: 
+      src: templates/grails.service 
+      dest: /etc/systemd/system/grails.service
+    become: true
+    notify: restartgrails
+  - name: "test web app"
+    get_url: 
+      url: http://192.168.10.10/
+      dest: /tmp/result
+  handlers:
+  - name: restartnginx
+    service:
+      name=nginx
+      state=restarted
+    become: true
+  - name: restartgrails
+    service:
+      name=grails
+      state=restarted
+    become: true
