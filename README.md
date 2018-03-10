@@ -6,11 +6,17 @@ Host requirements:
   optional ansible
 
 HOW TO USE:
-git clone git@github.com:good-code/ansible-bootstrap-grails.git
+
+git clone https://github.com/good-code/ansible-bootstrap-grails.git
+
 cd ansible-bootstrap-grails
+
 vagrand up
+
 vagrand provision 
+
 vagrand ssh
+
 vagrand destroy
 
 
